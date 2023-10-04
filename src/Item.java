@@ -1,6 +1,6 @@
 public class Item {
-    private String longName; // Det fulde navn på genstanden.
-    private String shortName; // Et kortere navn eller alias til genstanden.
+    private final String longName;
+    private final String shortName;
 
     public Item(String longName, String shortName) {
         this.longName = longName;

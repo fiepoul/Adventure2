@@ -3,16 +3,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Room {
-        private String name;
+
+    public enum Direction {
+        NORTH, SOUTH, EAST, WEST
+    }
+        private final String name;
         private final String description;
-        private Map<Direction, Room> exits;
-        private ArrayList<Item> items;
+        private final Map<Direction, Room> exits;
+        private final ArrayList<Item> items;
+
+        private final ArrayList<Food> foods;
 
     public Room(String name, String description) {
             this.name = name;
             this.description = description;
             this.exits = new HashMap<>();
             items = new ArrayList<>();
+            foods = new ArrayList<>();
         }
 
     public void addItem(Item item) {
@@ -27,30 +34,20 @@ public class Room {
         return exits.containsKey(direction);
     }
 
-    public void removeItemByIndex(int index) {
-        if (index >= 0 && index < items.size()) {
-            items.remove(index);
-        }
-    }
-
     public Item findItem(String itemName) {
         for (Item item : items) {
             if (item.getShortName().equalsIgnoreCase(itemName)) {
-                return item; // Returner genstanden, hvis den findes i rummet.
+                return item;
             }
         }
-        return null; // Returner null, hvis genstanden ikke kunne findes i rummet.
+        return null;
     }
 
         public void addExit(Direction direction, Room room) {
             exits.put(direction, room);
         }
 
-        public String getDescription() {
-            return description;
-        }
-
-    public String getFullDescription() {
+    public String getFullDescription() {// måske slet
         StringBuilder fullDescription = new StringBuilder(description);
         if (!items.isEmpty()) {
             fullDescription.append("\nItems in the room:");
@@ -73,23 +70,26 @@ public class Room {
         return items;
     }
 
-    public enum Direction {
-        NORTH, SOUTH, EAST, WEST;
+    public void addFood(Food food) {
+        foods.add(food);
+    }
+
+    public void removeFood(Food food) {
+        foods.remove(food);
+    }
+
+    public Food findFood(String foodName) {
+        for (Food food : foods) {
+            if (food.getShortName().equalsIgnoreCase(foodName)) {
+                return food;
+            }
         }
-
-    public Room getNorth() {
-        return exits.get("north");
+        return null;
     }
 
-    public Room getSouth() {
-        return exits.get("south");
+    public ArrayList<Food> getFoods() {
+        return foods;
     }
+}
 
-    public Room getEast() {
-        return exits.get("east");
-    }
 
-    public Room getWest() {
-        return exits.get("west");
-    }
-    }

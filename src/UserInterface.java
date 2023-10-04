@@ -7,122 +7,34 @@ public class UserInterface {
 
     private final Adventure adventure;
     private final Pattern commandPattern;
+    private final Player player;
 
     public UserInterface(Adventure adventure) {
         this.adventure = adventure;
-        commandPattern = Pattern.compile("^(go (north|south|east|west)|look|inventory|take\\s\\w+|drop\\s\\w+|help|exit)$");
+        this.player = adventure.getPlayer();
+        this.commandPattern = Pattern.compile("^(go (north|south|east|west)|look|inventory|take\\s\\w+|drop\\s\\w+|help|exit|health|eat\\s\\w+)$");
     }
 
     public void start() {
+        printWelcomeMessage();
+        printInitialInstructions();
+
         Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Welcome to the quest for the American Dream! You stand at the threshold. You are almost there..");
-
-        while (true) { // Fortsæt så længe brugeren vil spille
-            Room currentRoom = adventure.getCurrentRoom();
-            System.out.println("\n" + currentRoom.getName());
-            System.out.println(currentRoom.getDescription());
-            System.out.print("Where would you like to go? \nType 'help' for guidance: ");
-
+        while (true) {
             String input = scanner.nextLine().toLowerCase();
+
             if (validateCommand(input)) {
-                command(input);
+                handleCommand(input);
             } else {
                 System.out.println("Invalid command. Type 'help' for available commands.");
             }
         }
-    }
-    private boolean validateCommand(String input) {
-        Matcher matcher = commandPattern.matcher(input);
-        return matcher.matches();
+
     }
 
-    public void command(String input) {
-        Room currentRoom = adventure.getCurrentRoom();
-
-        switch (input) {
-            case "look" -> {
-                System.out.println("\nYou are in " + currentRoom.getName());
-                System.out.println(currentRoom.getDescription());
-                System.out.println(currentRoom.getFullDescription());
-
-            }
-            case "inventory" -> showInventory();
-            case "go north", "go south", "go east", "go west" -> move(input.split(" ")[1]);
-            case "help" -> printHelp();
-            case "exit" -> exitGame();
-            default -> {
-                if (input.startsWith("take")) {
-                    String itemName = input.split(" ", 2)[1];
-                    if (adventure.getCurrentRoom().findItem(itemName) != null) {
-                        takeItem(itemName); // Send det specifikke item navn med til metoden
-                    } else {
-                        System.out.println("There is nothing like '" + itemName + "' to take around here.");
-                    }
-                } else if (input.startsWith("drop")) {
-                    String itemName = input.split(" ", 2)[1];
-                    if (adventure.getPlayer().findItemInInventory(itemName) != null) {
-                        dropItem(itemName); // Send det specifikke item navn med til metoden
-                    } else {
-                        System.out.println("You don't have anything like '" + itemName + "' in your inventory.");
-                    }
-                } else {
-                    System.out.println("I don't understand that command.");
-                }
-            }
-        }
-    }
-
-    private void showInventory() {
-        ArrayList<Item> inventory = Player.getInventory();
-        if (inventory.isEmpty()) {
-            System.out.println("Your inventory is empty.");
-        } else {
-            System.out.println("Inventory:");
-            for (Item item : inventory) {
-                System.out.println("- " + item.getLongName());
-            }
-        }
-    }
-
-    private void takeItem(String itemName) {
-        Player player = adventure.getPlayer();
-        Room currentRoom = player.getCurrentRoom();
-
-        ArrayList<Item> roomItems = currentRoom.getItems();
-        if (roomItems.isEmpty()) {
-            System.out.println("There are no items to take in this room.");
-        } else {
-            System.out.println("Items available in this room:");
-            for (int i = 0; i < roomItems.size(); i++) {
-                System.out.println((i + 1) + ". " + roomItems.get(i).getLongName());
-            }
-
-            System.out.print("Enter the name of the item you want to take: ");
-            Scanner scanner = new Scanner(System.in);
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline character
-
-            if (choice >= 1 && choice <= roomItems.size()) {
-                Item selectedItem = roomItems.get(choice - 1);
-                if (player.takeItem(String.valueOf(selectedItem))) {
-                    currentRoom.removeItem(selectedItem);
-                    System.out.println("You took the " + selectedItem.getLongName() + ".");
-                } else {
-                    System.out.println("You can't carry more items.");
-                }
-            } else {
-                System.out.println("Invalid choice.");
-            }
-        }
-    }
-
-    private void dropItem(String itemName) {
-        if (adventure.getPlayer().dropItem(itemName)) {
-            System.out.println("You dropped the " + itemName + ".");
-        } else {
-            System.out.println("You don't have anything like '" + itemName + "' in your inventory.");
-        }
+    private void printInitialInstructions() {
+        System.out.println("You find yourself at the beginning of a journey. The path diverges before you.");
+        System.out.println("What would you like to do? Type 'help' to see your options: ");
     }
 
     private void printHelp() {
@@ -136,19 +48,107 @@ public class UserInterface {
         System.out.println("- exit: Farewell and goodbye.");
     }
 
-    private void exitGame() {
-        System.out.println("Farewell! Thank you for trying your luck in America.");
-        System.exit(0);
+    private boolean validateCommand(String input) {
+        Matcher matcher = commandPattern.matcher(input);
+        return matcher.matches();
     }
+
+    public void handleCommand(String input) {
+        Room currentRoom = adventure.getCurrentRoom();
+        String[] commandParts = input.split(" ", 2);
+        String command = commandParts[0];
+        String argument = commandParts.length > 1 ? commandParts[1] : "";
+
+        switch (command) {
+            case "look" -> {
+                System.out.println("\nYou are in " + currentRoom.getName());
+                System.out.println(currentRoom.getFullDescription());
+            }
+            case "inventory" -> showInventory();
+            case "items" -> showItems();
+            case "go" -> move(argument);
+            case "help" -> printHelp();
+            case "exit" -> exitGame();
+            case "take" -> {
+                if (player.takeItem(argument)) {
+                    System.out.println("You took " + argument + ".");
+                } else {
+                    System.out.println("There is no " + argument + " in this room.");
+                }
+            }
+            case "drop" -> {
+                if (player.dropItem(argument)) {
+                    System.out.println("You dropped " + argument + ".");
+                } else {
+                    System.out.println("You don't have " + argument + " in your inventory.");
+                }
+            }
+            case "eat" -> player.eatFood(argument);
+            default -> System.out.println("Invalid command. Type 'help' for available commands.");
+        }
+    }
+
+    private void printWelcomeMessage() {
+        System.out.println("Welcome to the quest for the American Dream! You stand at the threshold. You are almost there..");
+        printCurrentRoomDescription();
+    }
+
+    private void printCurrentRoomDescription() {
+        Room currentRoom = adventure.getCurrentRoom();
+        System.out.println("\n" + currentRoom.getName());
+        System.out.println(currentRoom.getFullDescription());
+
+        Player player = adventure.getPlayer();
+        System.out.println("Health: " + player.getHealth() + " - " + player.getHealthStatus());
+        showFood();
+        showItems();
+    }
+
+    private void showFood() {
+        ArrayList<Food> foods = adventure.getCurrentRoom().getFoods();
+        if (!foods.isEmpty()) {
+            System.out.println("Food available in this room:");
+            for (int i = 0; i < foods.size(); i++) {
+                System.out.println((i + 1) + ". " + foods.get(i).getLongName() + " (Restores " + foods.get(i).getHealthValue() + " health)");
+            }
+        } else {
+            System.out.println("There is no food in this room.");
+        }
+    }
+
+        private void showInventory () {
+            ArrayList<Item> inventory = player.getInventory();
+            if (inventory.isEmpty()) {
+                System.out.println("Your inventory is empty.");
+            } else {
+                System.out.println("Inventory:");
+                for (Item item : inventory) {
+                    System.out.println("- " + item.getLongName());
+                }
+            }
+        }
+
+        private void exitGame () {
+            System.out.println("Farewell! Thank you for trying your luck in America.");
+            System.exit(0);
+        }
 
     private void move(String direction) {
         Room.Direction dir = Room.Direction.valueOf(direction.toUpperCase());
-        Room currentRoom = adventure.getCurrentRoom();
-        if (currentRoom.isValidExit(dir)) {
-            adventure.move(String.valueOf(dir));
-            System.out.println("You have moved " + direction + ".");
+        adventure.move(dir);
+        printCurrentRoomDescription();
+    }
+
+    private void showItems() {
+        ArrayList<Item> roomItems = adventure.getCurrentRoom().getItems();
+        if (roomItems.isEmpty()) {
+            System.out.println("There are no items in this room.");
         } else {
-            System.out.println("You cannot go " + direction + " from here.");
+            System.out.println("Items available in this room:");
+            for (int i = 0; i < roomItems.size(); i++) {
+                System.out.println((i + 1) + ". " + roomItems.get(i).getLongName());
+            }
         }
     }
-}
+
+    }

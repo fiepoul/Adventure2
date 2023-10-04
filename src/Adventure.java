@@ -1,6 +1,7 @@
 public class Adventure {
     private Room currentRoom;
-    private Player player;
+
+    private final Player player;
 
     public Adventure() {
 
@@ -14,7 +15,7 @@ public class Adventure {
         Room room8 = new Room("Room 8", "You realize that you are never able to reach the american dream if you where not born into wealth. What do you do now? You are only one choice away from reaching your dream.");
         Room room9 = new Room("Room 9", "You're parents accepted your plea for money and offered a weekly allowance of 100 dollars if you call home more often. You accept.");
 
-        room1.addExit(Room.Direction.NORTH, room2);
+        room1.addExit(Room.Direction.EAST, room2);
         room1.addExit(Room.Direction.SOUTH, room4);
         room2.addExit(Room.Direction.WEST, room1);
         room2.addExit(Room.Direction.EAST, room3);
@@ -33,29 +34,46 @@ public class Adventure {
         room9.addExit(Room.Direction.WEST, room8);
         room9.addExit(Room.Direction.NORTH, room6);
 
-        Item jobOpportunity = new Item("A job opportunity that maybe can help reach the dream", "Job opportunity");
-        room2.addItem(jobOpportunity);
-        Item phone = new Item("Pick up the phone and call your parents", "Phone");
+        Item job = new Item("a job opportunity", "job");
+        room2.addItem(job);
+        Item phone = new Item("phone call with your parents", "phone");
         room6.addItem(phone);
-        Item paycheck = new Item("The paycheck that almost pays your rent","Paycheck");
+        Item paycheck = new Item("the paycheck", "check");
         room3.addItem(paycheck);
-        Item ticketToHollywood = new Item("Pick up your ticket to reach the stars", "Ticket to Hollywood");
-        room4.addItem(ticketToHollywood);
-        Item coffeeMug = new Item("Pick up the cup to do your job", "Coffee mug");
-        room6.addItem(coffeeMug);
-        Item parentsMoney = new Item("Pick up 100 dollars so you can pay your rent", "Money from parents");
-        room9.addItem(parentsMoney);
-        Item richSpouse = new Item("Pick up a rich possible spouse", "Rich possible spouse");
-        room8.addItem(richSpouse);
+        Item ticket = new Item("ticket to Hollywood", "ticket");
+        room4.addItem(ticket);
+        Item mug = new Item("coffee mug", "mug");
+        room6.addItem(mug);
+        Item money = new Item("100 dollars", "money");
+        room9.addItem(money);
+        Item spouse = new Item("a rich possible spouse", "spouse");
+        room8.addItem(spouse);
 
-        player = new Player(room1);
+        Food donut = new Food("Dunkin donut", "Donut", 5);
+        Food pizza = new Food("Pizza slice", "Pizza", 20);
+        Food burger = new Food("Cheeseburger", "burger", 30);
+        Food cake = new Food("Wedding cake", "cake", 30);
+        Food trash = new Food("Dumpster food", "trash", 20);
+        Food smoothie = new Food("Smoothie bowl", "Smoothie", 40);
+        Food coffee = new Food("Icecoffee", "Coffee", 5);
+
+        room2.addFood(donut);
+        room3.addFood(pizza);
+        room4.addFood(burger);
+        room5.addFood(cake);
+        room6.addFood(trash);
+        room8.addFood(smoothie);
+        room9.addFood(coffee);
+
         currentRoom = room1;
+        player = new Player(room1, 20);
     }
 
-    public void move(String direction) {
-        Room newRoom = currentRoom.getExit(Room.Direction.valueOf(direction));
-        if (newRoom != null) {
-            currentRoom = newRoom;
+    public void move(Room.Direction direction) {
+        if (currentRoom.isValidExit(direction)) {
+            currentRoom = currentRoom.getExit(direction);
+        } else {
+            System.out.println("You cannot go in that direction.");
         }
     }
 
@@ -69,5 +87,17 @@ public class Adventure {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public Item findItem(String itemName) {
+        return currentRoom.findItem(itemName);
+    }
+
+    public Food findFood(String foodName) {
+        return currentRoom.findFood(foodName);
+    }
+
+    public void removeFood(Food food) {
+        currentRoom.removeFood(food);
     }
 }
