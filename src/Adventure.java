@@ -43,7 +43,7 @@ public class Adventure {
         Item ticket = new Item("ticket to Hollywood", "ticket");
         room4.addItem(ticket);
         Item mug = new Item("coffee mug", "mug");
-        room6.addItem(mug);
+        room7.addItem(mug);
         Item money = new Item("100 dollars", "money");
         room9.addItem(money);
         Item spouse = new Item("a rich possible spouse", "spouse");
@@ -65,8 +65,22 @@ public class Adventure {
         room8.addFood(smoothie);
         room9.addFood(coffee);
 
+        RangedWeapon pistol = new RangedWeapon("Love pistol", "pistol", 6);
+        MeleeWeapon knife = new MeleeWeapon("Anti-violence knife", "knife");
+        MeleeWeapon sword = new MeleeWeapon("Compassionate sword", "sword");
+
+        room3.addWeapon(pistol);
+        room4.addWeapon(knife);
+        room7.addWeapon(sword);
+
+        Enemy anxiety = new Enemy("Anxiety", "anxiety of not making it", 20, knife);
+        Enemy homesickness = new Enemy("homesickness", "you miss your parents", 40, pistol);
+
+        room3.addEnemy(anxiety);
+        room8.addEnemy(homesickness);
+
         currentRoom = room1;
-        player = new Player(room1, 20);
+        player = new Player(room1, 40);
     }
 
     public void move(Room.Direction direction) {
@@ -81,20 +95,8 @@ public class Adventure {
         return currentRoom;
     }
 
-    public void setCurrentRoom(Room room) {
-        currentRoom = room;
-    }
-
     public Player getPlayer() {
         return player;
-    }
-
-    public Item findItem(String itemName) {
-        return currentRoom.findItem(itemName);
-    }
-
-    public Food findFood(String foodName) {
-        return currentRoom.findFood(foodName);
     }
 
     public void removeFood(Food food) {

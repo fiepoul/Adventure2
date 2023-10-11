@@ -13,13 +13,17 @@ public class Room {
         private final ArrayList<Item> items;
 
         private final ArrayList<Food> foods;
+        private final ArrayList<Weapon> weapons;
+        private ArrayList<Enemy> enemies;
 
     public Room(String name, String description) {
             this.name = name;
             this.description = description;
-            this.exits = new HashMap<>();
+            exits = new HashMap<>();
             items = new ArrayList<>();
             foods = new ArrayList<>();
+            weapons = new ArrayList<>();
+            enemies = new ArrayList<>();
         }
 
     public void addItem(Item item) {
@@ -28,10 +32,6 @@ public class Room {
 
     public void removeItem(Item item) {
         items.remove(item);
-    }
-
-    public boolean isValidExit(Direction direction) {
-        return exits.containsKey(direction);
     }
 
     public Item findItem(String itemName) {
@@ -43,31 +43,26 @@ public class Room {
         return null;
     }
 
-        public void addExit(Direction direction, Room room) {
+    public boolean isValidExit(Direction direction) {
+        return exits.containsKey(direction);
+    }
+    public void addExit(Direction direction, Room room) {
             exits.put(direction, room);
         }
-
-    public String getFullDescription() {// måske slet
-        StringBuilder fullDescription = new StringBuilder(description);
-        if (!items.isEmpty()) {
-            fullDescription.append("\nItems in the room:");
-            for (Item item : items) {
-                fullDescription.append("\n- ").append(item.getLongName());
-            }
-        }
-        return fullDescription.toString();
-    }
-
-        public Room getExit(Direction direction) {
+    public Room getExit(Direction direction) {
             return exits.get(direction);
         }
 
-        public String getName() {
+    public String getName() {
             return name;
         }
 
     public ArrayList<Item> getItems() {
         return items;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public void addFood(Food food) {
@@ -90,6 +85,41 @@ public class Room {
     public ArrayList<Food> getFoods() {
         return foods;
     }
+
+    public void addWeapon(Weapon weapon) {
+        weapons.add(weapon);
+    }
+
+    public void removeWeapon(Weapon weapon) {
+        weapons.remove(weapon);
+    }
+
+    public Weapon findWeapon(String weaponName) {
+        for (Weapon weapon : weapons) {
+            if (weapon.getShortName().equalsIgnoreCase(weaponName)) {
+                return weapon;
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<Weapon> getWeapons() {
+        return weapons;
+    }
+
+    public void addEnemy(Enemy enemy) {
+        enemies.add(enemy);
+    }
+
+    public void removeEnemy(Enemy enemy) {
+        enemies.remove(enemy);
+    }
+
+    public ArrayList<Enemy> getEnemies() {
+        return enemies;
+    }
 }
+
+
 
 

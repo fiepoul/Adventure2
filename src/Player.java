@@ -5,6 +5,8 @@ public class Player {
     private final ArrayList<Item> inventory;
     private int health;
 
+    private Weapon equippedWeapon;
+
     public Player(Room startingRoom, int initialHealth) {
         currentRoom = startingRoom;
         inventory = new ArrayList<>();
@@ -19,16 +21,6 @@ public class Player {
         health = newHealth;
     }
 
-    public boolean takeItem(String itemName) {
-        Item item = currentRoom.findItem(itemName);
-        if (item != null) {
-            inventory.add(item);
-            currentRoom.removeItem(item);
-            return true;
-        }
-        return false;
-    }
-
     public boolean dropItem(String itemName) {
         Item item = findItemInInventory(itemName);
         if (item != null) {
@@ -37,6 +29,11 @@ public class Player {
             return true;
         }
         return false;
+    }
+
+    public void addItemToInventory(Item item) {
+        inventory.add(item);
+        currentRoom.removeItem(item);
     }
 
     public Item findItemInInventory(String itemName) {
@@ -48,28 +45,46 @@ public class Player {
         return null;
     }
 
-    public ArrayList<Item> getInventory() {
-        return inventory;
-    }
+    public ArrayList<Item> getInventory(){
+            return inventory;
+        }
 
-    public void setCurrentRoom(Room room) {
-        currentRoom = room;
-    }
 
-    public Room getCurrentRoom() {
-        return currentRoom;
-    }
-    public void eatFood(String foodName) {
-        Food food = currentRoom.findFood(foodName);
+    public void eatFood(Food food) {
         if (food != null) {
             int healthRestored = food.getHealthValue();
             health += healthRestored;
-            health = Math.min(health, 100); // spillerens helbred kan ikke være over 100
-            currentRoom.removeFood(food);
-            System.out.println("You ate " + food.getLongName() + ". Health: " + health);
-        } else {
-            System.out.println("There is no " + foodName + " in this room.");
+            health = Math.min(health, 100);
         }
+    }
+
+    public boolean pickUpWeapon(Weapon weapon) {
+        if (currentRoom.getWeapons().contains(weapon)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean equipWeapon(String weaponName) {
+        Weapon weaponToEquip = findWeaponInInventory(weaponName);
+        if (weaponToEquip != null) {
+            equippedWeapon = weaponToEquip;
+            return true;
+        }
+        return false;
+    }
+
+    private Weapon findWeaponInInventory(String weaponName) {
+        for (Item item : inventory) {
+            if (item instanceof Weapon && item.getShortName().equalsIgnoreCase(weaponName)) {
+                return (Weapon) item;
+            }
+        }
+        return null;
+    }
+
+    public Weapon getEquippedWeapon() {
+        return equippedWeapon;
     }
 
     public String getHealthStatus() {
