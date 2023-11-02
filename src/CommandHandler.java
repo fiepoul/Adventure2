@@ -10,19 +10,21 @@ public class CommandHandler {
         this.player = player;
     }
 
-    public void look() {
+    public boolean look() {
         showCurrentroom();
         showItems();
         System.out.println("What would you like to do now? write 'help' for guidance: ");
+        return true;
     }
 
-    public void showCurrentroom() {
+    public boolean showCurrentroom() {
         System.out.println(adventure.getCurrentRoom().getName());
         System.out.println(adventure.getCurrentRoom().getDescription());
         showEnemiesInRoom();
+        return true;
     }
 
-    public void showInventory() {
+    public boolean showInventory() {
         ArrayList<Item> inventory = player.getInventory();
         if (inventory.isEmpty()) {
             System.out.println("Your inventory is empty.");
@@ -32,6 +34,7 @@ public class CommandHandler {
                 System.out.println("- " + item.getLongName());
             }
         }
+        return true;
     }
 
     public void showEnemiesInRoom() {
@@ -54,22 +57,22 @@ public class CommandHandler {
         }
     }
 
-    public void showItems() {
+    public boolean showItems() {
         showItemsList(adventure.getCurrentRoom().getItems(), "Items");
         showItemsList(adventure.getCurrentRoom().getWeapons(), "Weapons");
         showItemsList(adventure.getCurrentRoom().getFoods(), "Food");
+        return true;
     }
 
-    public void move(String direction) {
+    public boolean move(String direction) {
         Room.Direction dir;
         try {
             dir = Room.Direction.valueOf(direction.toUpperCase());
             if (adventure.getCurrentRoom().isValidExit(dir)) {
                 adventure.move(dir);
                 showCurrentroom();
-
                 if (adventure.getCurrentRoom().getName().equals("Room 5")) {
-                    exitGame();
+                    return winningGame();
                 }
             } else {
                 System.out.println("Can't go that direction. Try again: ");
@@ -77,9 +80,15 @@ public class CommandHandler {
         } catch (IllegalArgumentException e) {
             System.out.println("Invalid command, try north, south, east or west: ");
         }
+        return true;
     }
 
-    public void printHelp() {
+    public boolean winningGame() {
+        System.out.println("Farewell, dreamer! You've won the game by saying 'I do' to the bank account of your dreams.");
+        return false;
+    }
+
+    public boolean printHelp() {
         System.out.println("Available commands:");
         System.out.println("- look: View the current room description.");
         System.out.println("- inventory: View your inventory.");
@@ -91,13 +100,14 @@ public class CommandHandler {
         System.out.println("- go north/south/east/west: Move in the specified direction.");
         System.out.println("- help: Seek guidance on your quest.");
         System.out.println("- exit: Farewell and goodbye.");
+        return true;
     }
 
     public boolean exitGame() {
         System.out.println("Farewell! Thank you for trying your luck in America.");
         return false;
     }
-    public void takeItem(String itemName) {
+    public boolean takeItem(String itemName) {
         Item item = adventure.getCurrentRoom().findItem(itemName);
         Weapon weapon = adventure.getCurrentRoom().findWeapon(itemName);
 
@@ -111,19 +121,21 @@ public class CommandHandler {
         } else {
             System.out.println("There is no item or weapon named " + itemName + " in this room.");
         }
+        return true;
     }
 
-    public void equipWeapon(String weaponName) {
+    public boolean equipWeapon(String weaponName) {
         boolean equipped = player.equipWeapon(weaponName);
         if (equipped) {
             System.out.println("You have equipped " + weaponName);
         } else {
             System.out.println("Failed to equip the weapon. Please check your inventory.");
         }
+        return true;
     }
 
 
-    public void attackEnemy() {
+    public boolean attackEnemy() {
         ArrayList<Enemy> enemies = adventure.getCurrentRoom().getEnemies();
 
         if (!enemies.isEmpty()) {
@@ -132,6 +144,7 @@ public class CommandHandler {
 
             if (playerWeapon != null) {
                 int damage = playerWeapon.getDamage();
+                playerWeapon.use();
                 enemy.decreaseHealth(damage);
                 System.out.println("You attack " + enemy.getName() + " with " + playerWeapon.getLongName() + " and deal " + damage + " damage!");
 
@@ -155,18 +168,20 @@ public class CommandHandler {
         } else {
             System.out.println("There are no enemies in this room.");
         }
+        return true;
     }
 
-    public void dropItem(String itemName) {
+    public boolean dropItem(String itemName) {
         boolean itemDropped = player.dropItem(itemName);
         if (itemDropped) {
             System.out.println("You dropped " + itemName + " in the room.");
         } else {
             System.out.println("You don't have " + itemName + " in your inventory.");
         }
+        return true;
     }
 
-    public void eatFood(String foodName) {
+    public boolean eatFood(String foodName) {
         Food food = adventure.getCurrentRoom().findFood(foodName);
         if (food != null) {
             int healthRestored = food.getHealthValue();
@@ -176,6 +191,7 @@ public class CommandHandler {
         } else {
             System.out.println("There is no " + foodName + " in this room.");
         }
+        return true;
     }
 
 }

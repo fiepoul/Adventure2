@@ -65,13 +65,15 @@ public class Adventure {
         room8.addFood(smoothie);
         room9.addFood(coffee);
 
-        RangedWeapon pistol = new RangedWeapon("Love pistol", "pistol", 6);
+        RangedWeapon pistol = new RangedWeapon("Serenity pistol", "pistol", 6);
         MeleeWeapon knife = new MeleeWeapon("Anti-violence knife", "knife");
         MeleeWeapon sword = new MeleeWeapon("Compassionate sword", "sword");
+        MeleeWeapon bow = new MeleeWeapon("Cupid's bow", "bow");
 
         room3.addWeapon(pistol);
         room4.addWeapon(knife);
         room7.addWeapon(sword);
+        room8.addWeapon(bow);
 
         Enemy anxiety = new Enemy("Anxiety", "anxiety of not making it", 20, knife);
         Enemy homesickness = new Enemy("homesickness", "you miss your parents", 40, pistol);

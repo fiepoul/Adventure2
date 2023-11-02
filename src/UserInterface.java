@@ -35,11 +35,7 @@ public class UserInterface {
 
         CommandHandler commandHandler = new CommandHandler(adventure, player);
 
-        if (command.equals("exit")) {
-            return commandHandler.exitGame();
-        }
-
-        switch (command) {
+        return switch (command) {
             case "look" -> commandHandler.look();
             case "inventory" -> commandHandler.showInventory();
             case "items" -> commandHandler.showItems();
@@ -50,8 +46,9 @@ public class UserInterface {
             case "take" -> commandHandler.takeItem(argument);
             case "drop" -> commandHandler.dropItem(argument);
             case "eat" -> commandHandler.eatFood(argument);
-            default -> System.out.println("Invalid command: " + input + ". Type 'help' for available commands.");
-        }
-        return true;
+            case "exit" -> commandHandler.exitGame();
+            default -> {System.out.println("Invalid command: " + input + ". Type 'help' for available commands.");
+            yield true;}
+        };
     }
 }
