@@ -17,11 +17,10 @@ public class CommandHandler {
         return true;
     }
 
-    public boolean showCurrentroom() {
+    public void showCurrentroom() {
         System.out.println(adventure.getCurrentRoom().getName());
         System.out.println(adventure.getCurrentRoom().getDescription());
         showEnemiesInRoom();
-        return true;
     }
 
     public boolean showInventory() {
@@ -184,7 +183,6 @@ public class CommandHandler {
     public boolean eatFood(String foodName) {
         Food food = adventure.getCurrentRoom().findFood(foodName);
         if (food != null) {
-            int healthRestored = food.getHealthValue();
             player.eatFood(food);
             adventure.removeFood(food);
             System.out.println("You ate " + food.getLongName() + ". Health: " + player.getHealth());
