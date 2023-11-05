@@ -104,4 +104,8 @@ public class Adventure {
     public void removeFood(Food food) {
         currentRoom.removeFood(food);
     }
+
+    public void removeWeapon(Weapon weapon) {
+        currentRoom.removeWeapon(weapon);
+    }
 }

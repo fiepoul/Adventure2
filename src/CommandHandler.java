@@ -116,6 +116,7 @@ public class CommandHandler {
         } else if (weapon != null) {
             player.pickUpWeapon(weapon);
             player.addItemToInventory(weapon);
+            adventure.removeWeapon(weapon);
             System.out.println("You picked up a " + itemName + ".");
         } else {
             System.out.println("There is no item or weapon named " + itemName + " in this room.");
